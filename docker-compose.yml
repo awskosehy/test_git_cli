@@ -28,8 +28,7 @@ services:
   db_seeder:
     image: mysql:latest
     volumes:
-      - /data/gh/${SQL}:/${SQL}
-      - ./:/app
+      - /data/gh/test_git_cli/${SQL}:/${SQL}
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     entrypoint: [ "bash", "-c", "sleep 30 && mysql --user=root --host=db --port=3306 test_db < ./${SQL} && \
