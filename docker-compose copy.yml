@@ -21,18 +21,19 @@ services:
       MYSQL_DATABASE: test_db
     restart: unless-stopped
     volumes:
-      - db_vol:/var/lib/mysql
+      - db-vol:/var/lib/mysql
     ports:
       - "3306:3306"
 
   db_seeder:
     image: mysql:latest
     volumes:
-      - ./db.sql:/db.sql
+      - ./:/app/src
+      - db_vol:/app
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     entrypoint: [ "bash", "-c", "sleep 30 && \
-                                mysql --user=root --host=db --port=3306 test_db < /db.sql && \
+                                mysql --user=root --host=db --port=3306 test_db < /app/src/${SQL} && \
                                 exit"]
     depends_on:
       - db
