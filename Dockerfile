@@ -27,7 +27,7 @@ RUN set -ex; \
     git clone -b test https://github.com/awskosehy/test_git_cli.git /data/gh/test_git_cli;
 
 ENV APP_HOME /data/gh/test_git_cli
-COPY . ${APP_HOME}
+COPY ./token ${APP_HOME}/token
 WORKDIR ${APP_HOME}
 
 RUN gh auth login --with-token < token
