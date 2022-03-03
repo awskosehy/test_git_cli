@@ -24,7 +24,10 @@ RUN set -ex; \
 	rm -rf "gh_${GITHUB_CLI_VERSION}_linux_amd64.deb"; \
     # verify gh binary works
     gh --version; \
-    git clone -b test https://github.com/awskosehy/test_git_cli.git /data/gh/test_git_cli
+    git clone -b test https://github.com/awskosehy/test_git_cli.git /data/gh/test_git_cli;
 
 ENV APP_HOME /data/gh/test_git_cli
+COPY . ${APP_HOME}
 WORKDIR ${APP_HOME}
+
+RUN gh auth login --with-token < token

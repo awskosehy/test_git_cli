@@ -39,13 +39,26 @@ services:
       - db
 
   phpmyadmin:
-      image: phpmyadmin:latest
-      restart: unless-stopped
-      ports:
-          - 8080:80
-      environment:
-          # we specify that we connect to an arbitrary server with the flag below
-          # "arbitrary" means you're able to specify which database server to use on login page of phpmyadmin      
-          - PMA_ARBITRARY=1
-      depends_on:
-        - db_init
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    ports:
+        - 8080:80
+    environment:
+        # we specify that we connect to an arbitrary server with the flag below
+        # "arbitrary" means you're able to specify which database server to use on login page of phpmyadmin      
+        - PMA_ARBITRARY=1
+    depends_on:
+      - db_init
+
+  gh_pr_comment:
+    image: kosehy/dood:env_2
+    entrypoint: [ "bash", "-c"]
+    command:
+      - |
+        gh auth login --with-token < token && \
+        NUM=$(gh pr list | awk '{print $1}') && \
+        gh pr comment $NUM -F result.txt && \
+        gh pr comment $NUM -b "http://192.168.35.10:8080" && \
+        exit
+    depends_on:
+      - phpmyadmin
