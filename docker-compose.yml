@@ -5,14 +5,7 @@ volumes:
 
 services:
 
-  # We have 3 services: the database, the db seeder, and phpmyadmin
-
-  # pr_checker:
-  #   image: kosehy/dood:env
-  #   container_name: pr
-  #   volumes:
-  #     - db-vol:/src/gh/
-
+  # We have 3 services: the database, the db init, and phpmyadmin
   db:
     image: mysql:latest
     container_name: db
@@ -25,15 +18,23 @@ services:
     ports:
       - "3306:3306"
 
-  db_seeder:
+  db_init:
     image: mysql:latest
     volumes:
-      - ./db.sql:/db.sql
+      - ./:/app
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    entrypoint: [ "bash", "-c", "sleep 30 && \
-                                mysql --user=root --host=db --port=3306 test_db < /db.sql && \
-                                exit"]
+    entrypoint: [ "bash", "-c"]
+    command:
+      - |
+        sleep 25 && \
+        mysql \
+        --user=root \
+        --host=db \
+        --port=3306 \
+        --batch \
+        test_db < /app/${SQL} > /app/result.txt && \
+        exit
     depends_on:
       - db
 
@@ -47,4 +48,4 @@ services:
           # "arbitrary" means you're able to specify which database server to use on login page of phpmyadmin      
           - PMA_ARBITRARY=1
       depends_on:
-        - db_seeder
+        - db_init
