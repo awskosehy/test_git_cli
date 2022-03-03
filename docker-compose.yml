@@ -1,0 +1,62 @@
+version: "3"
+
+volumes:
+  db_vol:
+
+services:
+
+  # We have 4 services: the database, the db init, phpmyadmin, and gh_pr_comment
+  db:
+    image: mysql:latest
+    container_name: db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: test_db
+    restart: unless-stopped
+    volumes:
+      - db_vol:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  db_init:
+    image: mysql:latest
+    volumes:
+      - ./:/app
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    entrypoint: [ "bash", "-c"]
+    command:
+      - |
+        sleep 25 && \
+        mysql \
+        --user=root \
+        --host=db \
+        --port=3306 \
+        --batch \
+        test_db < /app/${SQL} > /app/result.txt && \
+        exit
+    depends_on:
+      - db
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    ports:
+        - 8080:80
+    environment:
+        - PMA_ARBITRARY=1
+    depends_on:
+      - db_init
+
+  gh_pr_comment:
+    image: kosehy/dood_env:v2
+    volumes:
+      - ./:/app
+    command: sh -c "
+        sleep 30 &&
+        gh auth login --with-token < token;
+        gh pr comment ${NUM} -F /app/result.txt;
+        gh pr comment ${NUM} -b "http://192.168.35.10:8080";
+        exit"
+    depends_on:
+      - phpmyadmin
