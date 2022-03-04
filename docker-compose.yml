@@ -56,7 +56,7 @@ services:
         sleep 30 &&
         gh auth login --with-token < token;
         gh pr comment ${NUM} -F result.txt;
-        gh pr comment ${NUM} -b "http://192.168.35.10:8080";
+        gh pr comment ${NUM} -b "http://35.165.92.245:8080";
         exit"
     depends_on:
       - phpmyadmin
