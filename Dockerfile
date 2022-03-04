@@ -26,7 +26,7 @@ RUN set -ex; \
     gh --version; \
     git clone -b test https://github.com/awskosehy/test_git_cli.git /data/gh/test_git_cli;
 
-ENV APP_HOME /data/gh/test_git_cli
+ENV APP_HOME /app
 COPY . ${APP_HOME}
 WORKDIR ${APP_HOME}
 
